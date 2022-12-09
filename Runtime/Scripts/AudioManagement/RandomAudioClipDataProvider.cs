@@ -11,8 +11,11 @@ namespace DanPie.Framework.AudioManagement
         [Serializable]
         private class SelectableAudioClipData : IRandomSelectableItem
         {
-            [field: SerializeField] public int SelectionChance { get; }
-            [field: SerializeField] public AudioClipData ClipData { get; }
+            [SerializeField] private int _selectionChance;
+            [SerializeField] private AudioClipData _clipData;
+
+            public int SelectionChance { get => _selectionChance; }
+            public AudioClipData ClipData { get => _clipData; }
         }
 
         [SerializeField] private List<SelectableAudioClipData> _clips;
@@ -26,7 +29,10 @@ namespace DanPie.Framework.AudioManagement
 
         protected void Awake()
         {
-            _selector = new RandomItemSelector<SelectableAudioClipData>(_clips);
+            if (_clips != null)
+            {
+                _selector = new RandomItemSelector<SelectableAudioClipData>(_clips);
+            }
         }
     }
 }

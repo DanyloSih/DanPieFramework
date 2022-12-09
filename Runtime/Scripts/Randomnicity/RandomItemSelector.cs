@@ -7,13 +7,23 @@ namespace DanPie.Framework.Randomnicity
         where T : IRandomSelectableItem
     {
         private readonly Random _random = new Random();   
-        private readonly List<T> _selectableItems;
+        private List<T> _selectableItems;
+
+        public RandomItemSelector()
+        {
+            _selectableItems = new List<T>();
+        }
 
         public RandomItemSelector(List<T> selectableItems)
         {
-            if (selectableItems == null && selectableItems.Count == 0)
+            SetItemsList(selectableItems);
+        }
+
+        public void SetItemsList(List<T> selectableItems)
+        {
+            if (selectableItems == null)
             {
-                throw new ArgumentException($"{nameof(selectableItems)} list must contain at least one element!");
+                throw new ArgumentException($"{nameof(selectableItems)} list can't be null!");
             }
 
             _selectableItems = new List<T>(selectableItems);
@@ -36,7 +46,16 @@ namespace DanPie.Framework.Randomnicity
                     }
                 } 
             }
-            return _selectableItems[0];
+
+            if (_selectableItems.Count == 0)
+            {
+                throw new Exception($"{nameof(RandomItemSelector<T>)} don't contain any selectable items. " +
+                    $"To resolve this use the {nameof(SetItemsList)} method.");
+            }
+            else
+            {
+                return _selectableItems[0];
+            }
         }
     }
 }
