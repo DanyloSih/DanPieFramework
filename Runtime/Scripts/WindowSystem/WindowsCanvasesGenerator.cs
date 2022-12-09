@@ -8,7 +8,7 @@ namespace DanPie.Framework.WindowSystem
         [Min(1)]
         [SerializeField] private int _countOfOrdersInLayer;
 
-        private List<WindowsCanvas> CreateWindowsCanvases(int windowsCanvasesCount)
+        public List<WindowsCanvas> CreateWindowsCanvases(int windowsCanvasesCount)
         {
             List<WindowsCanvas> windowsCanvases = new List<WindowsCanvas>();
 
@@ -22,9 +22,13 @@ namespace DanPie.Framework.WindowSystem
 
         private WindowsCanvas CreateWindowsCanvas(int windowsCanvasId)
         {
-            WindowsCanvas windowsCanvas = new GameObject($"WindowsCanvas n.{windowsCanvasId}").AddComponent<WindowsCanvas>();
-            windowsCanvas.SetLayerSortOrderBounds(
-                new Vector2Int(_countOfOrdersInLayer * windowsCanvasId + 1, _countOfOrdersInLayer * (windowsCanvasId + 1)));
+            WindowsCanvas windowsCanvas 
+                = new GameObject($"WindowsCanvas n.{windowsCanvasId}").AddComponent<WindowsCanvas>();
+
+            windowsCanvas.SetLayerSortOrderBounds(new Vector2Int(
+                _countOfOrdersInLayer * windowsCanvasId + 1, 
+                _countOfOrdersInLayer * (windowsCanvasId + 1)));
+
             return windowsCanvas;
         }
     }

@@ -15,5 +15,11 @@ namespace DanPie.Framework.WindowSystem.Demo
         {
             _continueButton.onClick.AddListener(() => OnContinue?.Invoke());
         }
+
+        protected override void OnHide()
+        {
+            OnContinue?.Invoke();
+            base.OnHide();
+        }
     }
 }

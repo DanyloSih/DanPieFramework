@@ -10,11 +10,14 @@ namespace DanPie.Framework.Pause
 
         private WindowsCanvas _popupCanvas;
         private IPauseWindow _pauseWindowInstance;
-        private PauseController _pauseController;
+        private IPauseController _pauseController;
 
-        public void Initialize(WindowsCanvas popupCanvas, IPauseWindow pauseWindowInstance)
+        public void Initialize(
+            WindowsCanvas popupCanvas,
+            IPauseWindow pauseWindowInstance,
+            IPauseController pauseController)
         {
-            _pauseController = new PauseController(new PausableObjectsProvider());
+            _pauseController = pauseController;
             _popupCanvas = popupCanvas;
             _pauseWindowInstance = pauseWindowInstance;
             _pauseWindowInstance.OnContinue += Resume;

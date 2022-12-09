@@ -10,6 +10,8 @@ namespace DanPie.Framework.Pause.Demo
         [SerializeField] private WindowsCanvas _popupCanvas;
         [SerializeField] private PauseWindow _pauseWindowPrefab;
 
+        private PauseController _pauseController;
+
         protected void Awake()
         {
             if (!_popupCanvas.IsWindowExist(_pauseWindowPrefab.GetType()))
@@ -19,8 +21,11 @@ namespace DanPie.Framework.Pause.Demo
                 _popupCanvas.AddUniqueWindow(instance);
             }
 
+            _pauseController = new PauseController(new PausableObjectsProvider());
+
             _pauseActivator.Initialize(_popupCanvas, 
-                (IPauseWindow)_popupCanvas.GetWindow(_pauseWindowPrefab.GetType()));
+                (IPauseWindow)_popupCanvas.GetWindow(_pauseWindowPrefab.GetType()), 
+                _pauseController);
         }
     }
 }
