@@ -1,0 +1,16 @@
+{
+  "name": "com.danpie.framework",
+  "version": "1.0.0",
+  "displayName": "DanPie Localization",
+  "description": "The set of scripts that I recreated in each new project is now placed in a separate package.",
+  "unity": "2020.3",
+  "unityRelease": "22f1",
+  "documentationUrl": "https://github.com/DanyloSih/DanPieFramework.git",
+  "changelogUrl": "https://github.com/DanyloSih/DanPieFramework.git",
+  "licensesUrl": "https://github.com/DanyloSih/DanPieFramework.git",
+  "author": {
+    "name": "Danylo Sigaev",
+    "email": "geratosfen@gmail.com",
+    "url": "https://github.com/DanyloSih/DanPieFramework.git"
+  }
+}
