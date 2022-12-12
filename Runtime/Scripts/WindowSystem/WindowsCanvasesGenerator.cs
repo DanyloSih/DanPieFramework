@@ -3,10 +3,14 @@ using UnityEngine;
 
 namespace DanPie.Framework.WindowSystem
 {
-    public class WindowsCanvasesCreator : MonoBehaviour
+    public class WindowsCanvasesCreator
     {
-        [Min(1)]
-        [SerializeField] private int _countOfOrdersInLayer;
+        private int _countOfOrdersInLayer;
+
+        public WindowsCanvasesCreator(int countOfOrdersInLayer)
+        {
+            _countOfOrdersInLayer = countOfOrdersInLayer;
+        }
 
         public List<WindowsCanvas> CreateWindowsCanvases(int windowsCanvasesCount)
         {

@@ -27,7 +27,7 @@ namespace DanPie.Framework.AudioManagement
             return _selector.GetRandomItem().ClipData;
         }
 
-        protected void Awake()
+        protected void OnEnable()
         {
             if (_clips != null)
             {
