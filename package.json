@@ -1,6 +1,6 @@
 {
   "name": "com.danpie.framework",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "displayName": "DanPie Framework",
   "description": "The set of scripts that I recreated in each new project is now placed in a separate package.",
   "unity": "2020.3",
