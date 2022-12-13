@@ -14,25 +14,24 @@ namespace DanPie.Framework.StateMachine
         {
             foreach (Transition transition in _transitions)
             {
-                transition.OnTransited += SetNextState;
+                transition.OnTransited += Exit;
                 transition.Enter();
             }
             OnEnter();
         }
 
-        public void Exit()
+        private void Exit(IState state)
         {
             foreach (Transition transition in _transitions)
             {
-                transition.OnTransited -= SetNextState;
+                transition.OnTransited -= Exit;
             }
             OnExit();
+            OnTransited?.Invoke(state);
         }
 
         protected abstract void OnEnter();
 
         protected abstract void OnExit();
-
-        private void SetNextState(IState state) => OnTransited?.Invoke(state);
     }
 }

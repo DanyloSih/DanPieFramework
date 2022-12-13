@@ -1,28 +1,33 @@
-﻿using UnityEngine;
-
-namespace DanPie.Framework.StateMachine
+﻿namespace DanPie.Framework.StateMachine
 {
-    public class StateMachine : MonoBehaviour, IStateMachine
+    public abstract class StateMachine<T> : IStateMachine<T>
+        where T : IState
     {
-        [SerializeField] private StateWithTransition _initialGameState;
+        private T _currentState;
 
-        private IState _currentState;
+        public T CurrentState { get => _currentState; }
 
-        public IState CurrentState { get => _currentState; }
-
-        public void Start()
+        public StateMachine(T initialState)
         {
-            _currentState = _initialGameState;
+            _currentState = initialState;
             _currentState.OnTransited += SetState;
             _currentState.Enter();
         }
 
-        public void SetState(IState state)
+        protected virtual void OnStateEnter(T state) { }
+
+        private void SetState(IState state)
+        {
+            SetTState((T)state);
+        }
+
+        private void SetTState(T state)
         {
             _currentState.OnTransited -= SetState;
             _currentState = state;
             _currentState.OnTransited += SetState;
             _currentState.Enter();
+            OnStateEnter(state);
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿namespace DanPie.Framework.StateMachine
 {
-    public interface IStateMachine
+    public interface IStateMachine<T> 
+        where T : IState
     {
-        public IState CurrentState {  get; }
-
-        public void SetState(IState state);
+        public T CurrentState { get; }
     }
 }
