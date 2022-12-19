@@ -36,6 +36,23 @@ namespace DanPie.Framework.WindowSystem
             window.Hide();
         }
 
+        public T GetWindow<T>()
+            where T : IWindow
+        {
+            return (T)GetWindow(typeof(T));
+        }
+
+        public IWindow GetWindow(Type windowType)
+        {
+            IWindow result = _windows.FirstOrDefault((x) => x.GetType() == windowType);
+            if (result == null)
+            {
+                throw new ArgumentException($"Window with windowType {windowType} not yet exist, if you want to interact with it " +
+                    $"from this canvas, first add it using the {nameof(AddUniqueWindow)} method.");
+            }
+            return result;
+        }
+
         public bool IsWindowExist(Type windowType)
         {
             return _windows.Any((x) => x.GetType() == windowType);
@@ -110,17 +127,6 @@ namespace DanPie.Framework.WindowSystem
                 window.Show(_currentSortingOrder);
                 _currentSortingOrder++;
             }
-        }
-
-        public IWindow GetWindow(Type windowType)
-        {
-            IWindow result = _windows.FirstOrDefault((x) => x.GetType() == windowType);
-            if (result == null)
-            {
-                throw new ArgumentException($"Window with windowType {windowType} not yet exist, if you want to interact with it " +
-                    $"from this canvas, first add it using the {nameof(AddUniqueWindow)} method.");
-            }
-            return result;
         }
 
         private List<IWindow> GetSortedVisibleWindows()

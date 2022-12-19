@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DanPie.Framework.StateMachine.Transitions;
 using UnityEngine;
 
 namespace DanPie.Framework.StateMachine
@@ -20,7 +21,7 @@ namespace DanPie.Framework.StateMachine
             OnEnter();
         }
 
-        private void Exit(IState state)
+        protected void Exit(IState state)
         {
             foreach (Transition transition in _transitions)
             {

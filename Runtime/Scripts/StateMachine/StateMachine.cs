@@ -7,7 +7,7 @@
 
         public T CurrentState { get => _currentState; }
 
-        public StateMachine(T initialState)
+        protected void StartStateMachine(T initialState)
         {
             _currentState = initialState;
             _currentState.OnTransited += SetState;
