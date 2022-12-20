@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DanPie.Framework.WindowSystem
@@ -26,8 +27,8 @@ namespace DanPie.Framework.WindowSystem
 
         private WindowsCanvas CreateWindowsCanvas(int windowsCanvasId)
         {
-            WindowsCanvas windowsCanvas 
-                = new GameObject($"WindowsCanvas n.{windowsCanvasId}").AddComponent<WindowsCanvas>();
+            WindowsCanvas windowsCanvas = new GameObject().AddComponent<WindowsCanvas>();
+            windowsCanvas.gameObject.name = $"WindowsCanvas |{windowsCanvasId}|";
 
             windowsCanvas.SetLayerSortOrderBounds(new Vector2Int(
                 _countOfOrdersInLayer * windowsCanvasId + 1, 

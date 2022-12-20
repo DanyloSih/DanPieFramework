@@ -1,40 +1,36 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace DanPie.Framework.Common
 {
-    public abstract class ActivableObject : MonoBehaviour, IActivable
+    public class ActivableObject : IActivable
     {
-        public bool IsActive { get; private set; }
-
-        private bool _isActivating = false;
-        private bool _isDeactivating = false;
+        public bool IsActive { get; private set; } = false;
+        public UnityEvent Activated { get; } = new UnityEvent();
+        public UnityEvent Deactivated { get; } = new UnityEvent();
 
         public void Activate()
         {
-            if (_isActivating)
+            if (IsActive == false)
             {
-                return;
+                IsActive = true;
+                OnActivate();
+                Activated.Invoke();
             }
-            _isActivating = true;
-            OnActivating();
-            IsActive = true;
-            _isActivating = false;
         }
 
         public void Deactivate()
         {
-            if (_isDeactivating)
+            if (IsActive == true)
             {
-                return;
+                IsActive = false;
+                OnDeactivate();
+                Deactivated.Invoke();
             }
-            _isDeactivating = true;
-            OnDeactivating();
-            IsActive = false;
-            _isDeactivating = false;
+
         }
 
-        protected abstract void OnActivating();
-        protected abstract void OnDeactivating();
+        protected virtual void OnActivate() { }
+        protected virtual void OnDeactivate() { }
     }
 }
