@@ -13,6 +13,16 @@ namespace DanPie.Framework.WindowSystem
         private int _currentSortingOrder = 0;
         private List<IWindow> _windows = new List<IWindow>();
 
+        public IWindow GetOrCreateWindow(Type type, Func<IWindow> windowFactoryMethod)
+        {
+            if (!IsWindowExist(type))
+            {
+                AddUniqueWindow(windowFactoryMethod.Invoke());
+            }
+
+            return GetWindow(type);
+        }
+
         public T GetOrCreateWindow<T>(Func<T> windowFactoryMethod)
             where T : IWindow
         {
