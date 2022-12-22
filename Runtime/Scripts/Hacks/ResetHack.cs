@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace DanPie.Framework.Hacks
 {
-    public class RemoveSavesHack : TriggerableParameter
+    public class ResetHack : TriggerableParameter
     {
         public override string Name { get; set; }
 
         private IResettable[] _resettableObjects;
 
-        public RemoveSavesHack(string parameterName, IResettable[] resettableObjects)
+        public ResetHack(string parameterName, IResettable[] resettableObjects)
         {
             Name = parameterName;
             _resettableObjects = resettableObjects;
@@ -18,7 +18,7 @@ namespace DanPie.Framework.Hacks
 
         protected override void OnTrigger()
         {
-            PlayerPrefs.DeleteAll();
+            UnityEngine.PlayerPrefs.DeleteAll();
             foreach (IResettable resettableObject in _resettableObjects)
             {
                 resettableObject.ResetObject();
