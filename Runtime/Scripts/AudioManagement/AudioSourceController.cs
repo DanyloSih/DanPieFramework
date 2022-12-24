@@ -10,6 +10,7 @@ namespace DanPie.Framework.AudioManagement
         private readonly ICoroutineExecutor _coroutineExecutor;
         private readonly Action<AudioSourceController> _returnToPoolAction;
         private Coroutine _playProcess;
+        private bool _returnToPoolAfterPlay;
 
         public AudioSourceController(
             AudioSource audioSource,
@@ -31,12 +32,14 @@ namespace DanPie.Framework.AudioManagement
             PoolName = poolName;
         }
 
-        public void Play(AudioClipData clipData, bool isLoop = false)
+        public void Play(AudioClipData clipData, bool isLoop = false, bool returnToPoolAfterPlay = true)
         {
             if (IsBusy)
             {
                 throw new AudioSourceBusyException();
             }
+
+            _returnToPoolAfterPlay = returnToPoolAfterPlay;
             AudioSource.enabled = true;
             PlayingAudioClipData = clipData;
             AudioSource.loop = isLoop;
@@ -52,6 +55,11 @@ namespace DanPie.Framework.AudioManagement
 
         public void Stop()
         {
+            if (!IsBusy)
+            {
+                return;
+            }
+
             if (_playProcess != null)
             {
                 _coroutineExecutor.BreakCoroutine(_playProcess);
@@ -61,7 +69,11 @@ namespace DanPie.Framework.AudioManagement
             PlayingAudioClipData = null;
             ResetAudioSource();
             AudioSource.enabled = false;
-            _returnToPoolAction.Invoke(this);
+
+            if (_returnToPoolAfterPlay)
+            {
+                _returnToPoolAction.Invoke(this);
+            }
         }
 
         private void ResetAudioSource()
