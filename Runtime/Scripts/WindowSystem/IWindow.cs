@@ -4,8 +4,9 @@ namespace DanPie.Framework.WindowSystem
 	{
 		public int SortOrder { get; }
 		public bool IsVisible { get; }	
+		public WindowsCanvas UsingCanvas { get; }	
 
-		public void Show(int order);
+		public void Show(WindowsCanvas windowsCanvas);
 		public void Hide();
 	}
 }

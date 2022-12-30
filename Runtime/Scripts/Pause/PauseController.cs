@@ -3,13 +3,12 @@
     public class PauseController : IPauseController
     {
         private IPausableObjectsProvider _objectsProvider;
+        private bool _isPaused = false;
 
         public PauseController(IPausableObjectsProvider objectsProvider)
         {
             _objectsProvider = objectsProvider;
         }
-
-        private bool _isPaused = false;
 
         public void PauseObjects()
         {

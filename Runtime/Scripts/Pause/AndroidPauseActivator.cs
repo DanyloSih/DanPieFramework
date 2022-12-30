@@ -4,13 +4,15 @@ using UnityEngine;
 
 namespace DanPie.Framework.Pause
 {
-    public class AndroidPauseActivator : MultipleInitializableMonoBehaviour
+    public class AndroidPauseActivator : MultipleInitializableMonoBehaviour, IPauseActivator
     {
         [SerializeField] private KeyCode _backKeyCode;
 
         private WindowsCanvas _popupCanvas;
         private IPauseWindow _pauseWindowInstance;
         private IPauseController _pauseController;
+
+        public bool Enabled { get => enabled; set => enabled = value; }
 
         public void Initialize(
             WindowsCanvas popupCanvas,
@@ -31,12 +33,18 @@ namespace DanPie.Framework.Pause
 
         protected void OnApplicationFocus(bool focus)
         {
-            SetPause(!focus);
+            if (Enabled)
+            {
+                SetPause(!focus);
+            }
         }
 
         protected void OnApplicationPause(bool pause)
         {
-            SetPause(pause);
+            if (Enabled)
+            {
+                SetPause(pause);
+            }
         }
 
         protected void Update()
@@ -66,7 +74,7 @@ namespace DanPie.Framework.Pause
         private void OnBackButtonPressed()
         {
             CheckIsInitialized();
-            IWindow window = _popupCanvas.GetLastVisibleWindow();
+            IWindow window = _popupCanvas.GetFirstVisibleWindow();
             if (window != null)
             {
                 if (window.GetType() == _pauseWindowInstance.GetType())

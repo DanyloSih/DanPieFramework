@@ -8,10 +8,24 @@ namespace DanPie.Framework.WindowSystem
 
     public class WindowsCanvas : MonoBehaviour
 	{
+        private class WindowData
+        {
+            public int SortingOrder;
+            public IWindow Window;
+
+            public WindowData(int sortingOrder, IWindow window)
+            {
+                SortingOrder = sortingOrder;
+                Window = window;
+            }
+        }
+
         [SerializeField] private Vector2Int _layerSortOrderBounds = new Vector2Int(1, 1000);
 
         private int _currentSortingOrder = 0;
-        private List<IWindow> _windows = new List<IWindow>();
+        private List<WindowData> _windowsData = new List<WindowData>();
+
+        public event Action<WindowsCanvas> SortingOrderChanged;
 
         public IWindow GetOrCreateWindow(Type type, Func<IWindow> windowFactoryMethod)
         {
@@ -38,11 +52,11 @@ namespace DanPie.Framework.WindowSystem
         {
             if (IsWindowExist(window.GetType()))
             {
-                throw new ArgumentException("This window is already on the canvas, if you want to use it " +
+                throw new ArgumentException("This windowData is already on the canvas, if you want to use it " +
                     $"call the {nameof(GetWindow)} method.");
             }
 
-            _windows.Add(window);
+            _windowsData.Add(new WindowData(0, window));
             window.Hide();
         }
 
@@ -54,70 +68,109 @@ namespace DanPie.Framework.WindowSystem
 
         public IWindow GetWindow(Type windowType)
         {
-            IWindow result = _windows.FirstOrDefault((x) => x.GetType() == windowType);
-            if (result == null)
-            {
-                throw new ArgumentException($"Window with windowType {windowType} not yet exist, if you want to interact with it " +
-                    $"from this canvas, first add it using the {nameof(AddUniqueWindow)} method.");
-            }
-            return result;
+            return GetWindowData(windowType).Window;
         }
 
         public bool IsWindowExist(Type windowType)
         {
-            return _windows.Any((x) => x.GetType() == windowType);
+            return _windowsData.Any((x) => x.Window.GetType() == windowType);
+        }
+
+        public void FocusOnWindow(Type windowType)
+        {
+            WindowData windowData = GetWindowData(windowType);
+            if (!windowData.Window.IsVisible)
+            {
+                throw new ArgumentException("To focus window, it must be visible!");
+            }
+            SortingOrderChanged?.Invoke(this);
+        }
+
+        public int GetWindowSortOrder(Type windowType)
+        {
+            WindowData windowData = GetWindowData(windowType);
+
+            if (!windowData.Window.IsVisible)
+            {
+                throw new ArgumentException("To get window SortOrder, it must be visible!");
+            }
+
+            return windowData.SortingOrder;
+        }
+
+        public void SwapWindows(Type aType, Type bType)
+        {
+            WindowData aInstance = GetWindowData(aType);
+            WindowData bInstance = GetWindowData(bType);
+
+            if (!aInstance.Window.IsVisible || !bInstance.Window.IsVisible)
+            {
+                throw new ArgumentException("To swap windowsData, they must both be visible!");
+            }
+
+            List<WindowData> windowsData = GetSortedVisibleWindowsData();
+            int aIndex = windowsData.IndexOf(aInstance);
+            int bIndex = windowsData.IndexOf(bInstance);
+            windowsData[aIndex] = bInstance;
+            windowsData[bIndex] = aInstance;
+
+            ResetSortingOrders(windowsData);
         }
 
         public void SetLayerSortOrderBounds(Vector2Int layerSortOrderBounds)
         {
             _layerSortOrderBounds = layerSortOrderBounds;
-            ResetSortingOrders();
+            ResetSortingOrders(GetSortedVisibleWindowsData());
         }
 
         public void RemoveWindow(Type windowType)
         {
-            _windows.Remove(GetWindow(windowType));
+            _windowsData.Remove(GetWindowData(windowType));
         }
 
         public void ShowOnly(Type windowType)
         {
             HideAll();
-            GetWindow(windowType).Show(_currentSortingOrder);
+            WindowData windowData = GetWindowData(windowType);
+            windowData.SortingOrder = _currentSortingOrder;
+            windowData.Window.Show(this);
             _currentSortingOrder++;
         }
 
         public void ShowAlso(Type windowType)
         {
-            GetWindow(windowType).Show(_currentSortingOrder);
+            WindowData windowData = GetWindowData(windowType);
+            windowData.SortingOrder = _currentSortingOrder;
+            windowData.Window.Show(this);
             _currentSortingOrder++;
 
             if (_currentSortingOrder >= _layerSortOrderBounds.y)
             {
-                ResetSortingOrders();
+                ResetSortingOrders(GetSortedVisibleWindowsData());
             }
         }
 
-        public IWindow GetLastVisibleWindow()
+        public IWindow GetFirstVisibleWindow()
         {
-            List<IWindow> windows = GetSortedVisibleWindows();
-            if (windows.Count == 0)
+            List<WindowData> windowsData = GetSortedVisibleWindowsData();
+            if (windowsData.Count == 0)
             {
                 return null;
             }
             else
             {
-                return windows.Last();
+                return windowsData[0].Window;
             }
         }
 
         public void HideAll()
         {
             _currentSortingOrder = _layerSortOrderBounds.x;
-            foreach (IWindow window in _windows)
+            foreach (WindowData windowData in _windowsData)
             {
-                if (window.IsVisible)
+                if (windowData.Window.IsVisible)
                 {
-                    window.Hide();
+                    windowData.Window.Hide();
                 }
             }
         }
@@ -127,23 +180,34 @@ namespace DanPie.Framework.WindowSystem
             _currentSortingOrder = _layerSortOrderBounds.x;
         }
 
-        private void ResetSortingOrders()
+        private void ResetSortingOrders(List<WindowData> activeWindows)
         {
             _currentSortingOrder = _layerSortOrderBounds.x;
-            List<IWindow> active = GetSortedVisibleWindows();
 
-            foreach (IWindow window in active)
+            foreach (WindowData windowData in activeWindows)
             {
-                window.Show(_currentSortingOrder);
+                windowData.SortingOrder = _currentSortingOrder;
                 _currentSortingOrder++;
             }
+            SortingOrderChanged?.Invoke(this);
         }
 
-        private List<IWindow> GetSortedVisibleWindows()
+        private List<WindowData> GetSortedVisibleWindowsData()
         {
-            List<IWindow> active = _windows.Where((x) => x.IsVisible).ToList();
-            active.Sort((x, y) => Mathf.Clamp(x.SortOrder - y.SortOrder, -1, 1));
+            List<WindowData> active = _windowsData.Where((x) => x.Window.IsVisible).ToList();
+            active.Sort((x, y) => x.Window.SortOrder.CompareTo(y.Window.SortOrder));
             return active;
+        }
+
+        private WindowData GetWindowData(Type windowType)
+        {
+            WindowData windowData = _windowsData.FirstOrDefault((x) => x.Window.GetType() == windowType);
+            if (windowData == null)
+            {
+                throw new ArgumentException($"Window with windowType {windowType} not yet exist, if you want to interact with it " +
+                    $"from this canvas, first add it using the {nameof(AddUniqueWindow)} method.");
+            }
+            return windowData;
         }
     }
 }
