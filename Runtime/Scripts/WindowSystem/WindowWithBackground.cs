@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace DanPie.Framework.WindowSystem
 {
@@ -25,15 +26,16 @@ namespace DanPie.Framework.WindowSystem
             }
         }
 
-        protected override void OnShow()
+        protected sealed override void OnShow()
         {
             base.OnShow();
             var background = BackgroundWindow;
             if (background != null)
             {
                 UsingCanvas.ShowAlso(background.GetType());
-                UsingCanvas.FocusOnWindow(GetType());
+                UsingCanvas.FocusOnWindow(this.GetType());
             }
+            OnShowWithBackground();
         }
 
         protected override void OnHide()
@@ -45,5 +47,7 @@ namespace DanPie.Framework.WindowSystem
             }
             base.OnHide();
         }
+
+        protected virtual void OnShowWithBackground() { }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using DanPie.Framework.Coroutines;
+using DanPie.Framework.Pause;
 using DanPie.Framework.Pooling;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -13,6 +14,7 @@ namespace DanPie.Framework.AudioManagement
         private int _sourcesInitialCount = 5;
         private readonly GameObject _sourcesContainer;
         private readonly CoroutineExecutor _coroutineExecutor;
+        private readonly PausableObjectsContainer _pausableObjectsContainer;
         private PoolOfType<AudioSourceController> _audioSourceControllerPool;
         private List<AudioSourceController> _activeSources = new List<AudioSourceController>();
 
@@ -24,7 +26,8 @@ namespace DanPie.Framework.AudioManagement
         public AudioSourcesManager(
             int sourcesInitialCount,
             GameObject sourcesContainer,
-            CoroutineExecutor coroutineExecutor)
+            CoroutineExecutor coroutineExecutor,
+            PausableObjectsContainer pausableObjectsContainer)
         {
             if (sourcesInitialCount < 0)
             {
@@ -34,11 +37,16 @@ namespace DanPie.Framework.AudioManagement
             _sourcesInitialCount = sourcesInitialCount;
             _sourcesContainer = sourcesContainer;
             _coroutineExecutor = coroutineExecutor;
-
+            _pausableObjectsContainer = pausableObjectsContainer;
             var poolBehaviour = new PoolObjectInitializingBehaviour<AudioSourceController>()
             {
                 OnCreatedAction = (x) => x.AudioSource.enabled = false,
-                OnDisposedAction = (x) => MonoBehaviour.Destroy(x.AudioSource),
+
+                OnDisposedAction = (x) => { 
+                    _pausableObjectsContainer.RemoveIfInList(x);
+                    MonoBehaviour.Destroy(x.AudioSource);
+                },
+
                 OnReturnedToPoolAction = (x) => _activeSources.Remove(x)
             };
 
@@ -57,10 +65,14 @@ namespace DanPie.Framework.AudioManagement
 
         private AudioSourceController NewAudioSourceUser()
         {
-            return new AudioSourceController(
+            AudioSourceController sourceController = new AudioSourceController(
                 _sourcesContainer.AddComponent<AudioSource>(),
                 _coroutineExecutor,
                 (x) => _audioSourceControllerPool.ReturnInstance(x));
+
+            _pausableObjectsContainer.AddIfNotInList(sourceController);
+
+            return sourceController;
         }
     }
 }

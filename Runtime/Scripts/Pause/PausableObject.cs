@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
 namespace DanPie.Framework.Pause
 {
-
-    public abstract class PausableObject : MonoBehaviour, IPausable
+    public abstract class PausableObject : MonoBehaviour, IPausable, IPauseStateProvider
     {
-        private List<Task> _pausableDelayTasks = new List<Task>();
-        private CancellationTokenSource _onPausedCTS = new CancellationTokenSource();
-
-        public CancellationToken OnPauseCancellationToken { get; private set; } = new CancellationToken();
+        public CancellationTokenSource OnPausedCTS { get; private set; } = new CancellationTokenSource();
         public bool IsPaused { get; private set; } = false;
-        
-        public async Task Until(Func<bool> condition, int frequency = 10, int timeout = -1)
+
+        public async Task WaitUntil(Func<bool> condition, int frequency = 10, int timeout = -1)
         {
             var waitTask = Task.Run(async () =>
             {
@@ -35,30 +30,30 @@ namespace DanPie.Framework.Pause
             {
                 try
                 {
-                    await Until(() => IsPaused, frequency);
+                    await WaitUntil(() => IsPaused, frequency);
                     startTime = DateTime.Now;
-                    await Task.Delay(remainTime, _onPausedCTS.Token);
+                    await Task.Delay(remainTime, OnPausedCTS.Token);
                     break;
                 }
                 catch (TaskCanceledException)
                 {
                     remainTime -= (DateTime.Now - startTime).Milliseconds;
-                } 
+                }
             }
-            await Until(() => IsPaused, frequency);
+            await WaitUntil(() => IsPaused, frequency);
         }
 
         public void Pause()
         {
             enabled = false;
             IsPaused = true;
-            _onPausedCTS.Cancel();
+            OnPausedCTS.Cancel();
             OnPause();
         }
 
         public void Resume()
         {
-            _onPausedCTS = new CancellationTokenSource();
+            OnPausedCTS = new CancellationTokenSource();
             enabled = true;
             IsPaused = false;
             OnResume();

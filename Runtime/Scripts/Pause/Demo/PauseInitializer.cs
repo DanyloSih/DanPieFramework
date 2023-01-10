@@ -1,4 +1,5 @@
-﻿using DanPie.Framework.WindowSystem;
+﻿using System.Collections.Generic;
+using DanPie.Framework.WindowSystem;
 using DanPie.Framework.WindowSystem.Demo;
 using UnityEngine;
 
@@ -21,7 +22,8 @@ namespace DanPie.Framework.Pause.Demo
                 _popupCanvas.AddUniqueWindow(instance);
             }
 
-            _pauseController = new PauseController(new PausableObjectsProvider());
+            _pauseController = new PauseController(
+                new List<IPausableObjectsProvider>() { new PausableComponentsFinder() });
 
             _pauseActivator.Initialize(_popupCanvas, 
                 (IPauseWindow)_popupCanvas.GetWindow(_pauseWindowPrefab.GetType()), 

@@ -1,15 +1,17 @@
 ﻿using System;
 using DanPie.Framework.Coroutines;
+using DanPie.Framework.Pause;
 using DanPie.Framework.Pooling;
 using UnityEngine;
 
 namespace DanPie.Framework.AudioManagement
 {
-    public class AudioSourceController : IPoolable
+    public class AudioSourceController : IPoolable, IPausable, IPauseStateProvider
     {
         private readonly ICoroutineExecutor _coroutineExecutor;
         private readonly Action<AudioSourceController> _returnToPoolAction;
         private Coroutine _playProcess;
+        private bool _isPausable;
         private bool _returnToPoolAfterPlay;
 
         public AudioSourceController(
@@ -26,33 +28,63 @@ namespace DanPie.Framework.AudioManagement
         public AudioSource AudioSource { get; private set; }
         public AudioClipData PlayingAudioClipData { get; private set; }
         public bool IsBusy { get => AudioSource.enabled; }
+        public bool IsPaused { get; private set; }
 
         public void InitPoolableObject(string poolName)
         {
             PoolName = poolName;
         }
 
-        public void Play(AudioClipData clipData, bool isLoop = false, bool returnToPoolAfterPlay = true)
+        public void Pause()
+        {
+            if (_isPausable)
+            {
+                AudioSource.Pause();
+                IsPaused = true;
+            }
+            else
+            {
+                IsPaused = false;
+            }
+        }
+
+        public void Resume()
+        {
+            if (_isPausable)
+            {
+                AudioSource.UnPause();
+            }
+
+            IsPaused = false;
+        }
+
+        public void Play(
+            AudioClipData clipData,
+            bool isLooped = false,
+            bool returnToPoolAfterPlay = true,
+            bool isPausable = false)
         {
             if (IsBusy)
             {
                 throw new AudioSourceBusyException();
             }
-
+            IsPaused = false;
+            _isPausable = isPausable;
             _returnToPoolAfterPlay = returnToPoolAfterPlay;
             AudioSource.enabled = true;
             PlayingAudioClipData = clipData;
-            AudioSource.loop = isLoop;
+            AudioSource.loop = isLooped;
             AudioSource.outputAudioMixerGroup = clipData.MixerGroup;
             AudioSource.clip = clipData.AudioClip;
             float clipDuration = clipData.AudioClip.length;
             AudioSource.Play();
-            if (!isLoop)
+            if (!isLooped)
             {
-                _playProcess = _coroutineExecutor.ExecuteCoroutine(CoroutineUtilities.WaitForSeconds(clipDuration, Stop));
+                _playProcess = _coroutineExecutor.ExecuteCoroutine(
+                    CoroutineUtilities.PausableWaitForSeconds(clipDuration, this, Stop));
             }
         }
-
+        
         public void Stop()
         {
             if (!IsBusy)

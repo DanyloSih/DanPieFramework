@@ -16,6 +16,7 @@ namespace DanPie.Framework.WindowSystem
         public int SortOrder { get; private set; }
         public WindowsCanvas UsingCanvas { get; private set; }
 
+        [ContextMenu("Hide")]
         public void Hide()
         {
             if (_isHiding)

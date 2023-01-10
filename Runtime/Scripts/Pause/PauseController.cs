@@ -1,14 +1,18 @@
-﻿namespace DanPie.Framework.Pause
+﻿using System.Collections.Generic;
+
+namespace DanPie.Framework.Pause
 {
-    public class PauseController : IPauseController
+    public class PauseController : IPauseController, IPauseStateProvider
     {
-        private IPausableObjectsProvider _objectsProvider;
+        private List<IPausableObjectsProvider> _objectsProviders;
         private bool _isPaused = false;
 
-        public PauseController(IPausableObjectsProvider objectsProvider)
+        public PauseController(List<IPausableObjectsProvider> objectsProvider)
         {
-            _objectsProvider = objectsProvider;
+            _objectsProviders = objectsProvider;
         }
+
+        public bool IsPaused { get => _isPaused; }
 
         public void PauseObjects()
         {
@@ -16,9 +20,12 @@
             {
                 _isPaused = true;
 
-                foreach (IPausable pausableObject in _objectsProvider.GetPausableObjects())
+                foreach (var objectsProvider in _objectsProviders)
                 {
-                    pausableObject.Pause();
+                    foreach (IPausable pausableObject in objectsProvider.GetPausableObjects())
+                    {
+                        pausableObject.Pause();
+                    } 
                 }
             }
         }
@@ -28,9 +35,12 @@
             if (_isPaused == true)
             {
                 _isPaused = false;
-                foreach (IPausable pausableObject in _objectsProvider.GetPausableObjects())
+                foreach (var objectsProvider in _objectsProviders)
                 {
-                    pausableObject.Resume();
+                    foreach (IPausable pausableObject in objectsProvider.GetPausableObjects())
+                    {
+                        pausableObject.Resume();
+                    } 
                 }
             }
         }
