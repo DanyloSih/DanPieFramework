@@ -7,7 +7,7 @@ namespace DanPie.Framework.Pause
         public bool Enabled { get; set; }
 
         public void Initialize(
-            WindowsCanvas popupCanvas,
+            WindowsCanvas pauseWindowCanvas,
             IPauseWindow pauseWindowInstance,
             IPauseController pauseController);
     }

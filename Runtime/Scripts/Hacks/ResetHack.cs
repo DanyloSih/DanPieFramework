@@ -1,6 +1,7 @@
 ﻿using DanPie.Framework.Common;
 using DanPie.Framework.Parameters;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace DanPie.Framework.Hacks
 {
@@ -23,6 +24,7 @@ namespace DanPie.Framework.Hacks
             {
                 resettableObject.ResetObject();
             }
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 }

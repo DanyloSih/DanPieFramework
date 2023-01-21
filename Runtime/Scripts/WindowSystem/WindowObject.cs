@@ -7,7 +7,7 @@ namespace DanPie.Framework.WindowSystem
     public abstract class WindowObject : MonoBehaviour, IWindow
     {
         private Type _myType;
-
+        private int _hidesCounter = 0;
         private Canvas _canvas;
         private bool _isHiding;
         private bool _isShowing;
@@ -15,10 +15,13 @@ namespace DanPie.Framework.WindowSystem
         public bool IsVisible { get; private set; }
         public int SortOrder { get; private set; }
         public WindowsCanvas UsingCanvas { get; private set; }
+        public bool IsFirstHiding { get => _hidesCounter == 1; }
 
         [ContextMenu("Hide")]
         public void Hide()
         {
+            _hidesCounter = Mathf.Clamp(_hidesCounter + 1, 0, 2);
+            
             if (_isHiding)
             {
                 return;

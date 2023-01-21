@@ -83,7 +83,11 @@ namespace DanPie.Framework.WindowSystem
             {
                 throw new ArgumentException("To focus window, it must be visible!");
             }
-            SortingOrderChanged?.Invoke(this);
+            var sortedWindows = GetSortedVisibleWindowsData();
+            sortedWindows.Remove(windowData);
+            sortedWindows.Add(windowData);
+
+            ResetSortingOrders(sortedWindows);
         }
 
         public int GetWindowSortOrder(Type windowType)
@@ -133,16 +137,16 @@ namespace DanPie.Framework.WindowSystem
             HideAll();
             WindowData windowData = GetWindowData(windowType);
             windowData.SortingOrder = _currentSortingOrder;
-            windowData.Window.Show(this);
             _currentSortingOrder++;
+            windowData.Window.Show(this);
         }
 
         public void ShowAlso(Type windowType)
         {
             WindowData windowData = GetWindowData(windowType);
             windowData.SortingOrder = _currentSortingOrder;
-            windowData.Window.Show(this);
             _currentSortingOrder++;
+            windowData.Window.Show(this);
 
             if (_currentSortingOrder >= _layerSortOrderBounds.y)
             {
@@ -150,7 +154,7 @@ namespace DanPie.Framework.WindowSystem
             }
         }
 
-        public IWindow GetFirstVisibleWindow()
+        public IWindow GetFocusedWindow()
         {
             List<WindowData> windowsData = GetSortedVisibleWindowsData();
             if (windowsData.Count == 0)
@@ -159,7 +163,7 @@ namespace DanPie.Framework.WindowSystem
             }
             else
             {
-                return windowsData[0].Window;
+                return windowsData[windowsData.Count - 1].Window;
             }
         }
 
@@ -195,7 +199,7 @@ namespace DanPie.Framework.WindowSystem
         private List<WindowData> GetSortedVisibleWindowsData()
         {
             List<WindowData> active = _windowsData.Where((x) => x.Window.IsVisible).ToList();
-            active.Sort((x, y) => x.Window.SortOrder.CompareTo(y.Window.SortOrder));
+            active.Sort((x, y) => x.SortingOrder - y.SortingOrder);
             return active;
         }
 

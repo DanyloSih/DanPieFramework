@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 namespace DanPie.Framework.WindowSystem
 {
+
     public class PauseWindow : WindowWithBackground, IPauseWindow
     {
         [SerializeField] private Button _continueButton;

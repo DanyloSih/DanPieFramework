@@ -74,7 +74,7 @@ namespace DanPie.Framework.Pause
         private void OnBackButtonPressed()
         {
             CheckIsInitialized();
-            IWindow window = _popupCanvas.GetFirstVisibleWindow();
+            IWindow window = _popupCanvas.GetFocusedWindow();
             if (window != null)
             {
                 if (window.GetType() == _pauseWindowInstance.GetType())

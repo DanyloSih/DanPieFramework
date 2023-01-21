@@ -26,7 +26,7 @@ namespace DanPie.Framework.WindowSystem
             }
         }
 
-        protected sealed override void OnShow()
+        protected override void OnShow()
         {
             base.OnShow();
             var background = BackgroundWindow;
@@ -35,7 +35,6 @@ namespace DanPie.Framework.WindowSystem
                 UsingCanvas.ShowAlso(background.GetType());
                 UsingCanvas.FocusOnWindow(this.GetType());
             }
-            OnShowWithBackground();
         }
 
         protected override void OnHide()
@@ -47,7 +46,5 @@ namespace DanPie.Framework.WindowSystem
             }
             base.OnHide();
         }
-
-        protected virtual void OnShowWithBackground() { }
     }
 }
