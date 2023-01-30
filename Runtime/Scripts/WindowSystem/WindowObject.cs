@@ -49,12 +49,33 @@ namespace DanPie.Framework.WindowSystem
             _isShowing = true;
             IsVisible = true;
             _canvas.enabled = true;
-            TryUpdateWindowsCanvas(windowsCanvas);
+            UpdateWindowsCanvas(windowsCanvas);
             OnShow();
             _isShowing = false;
         }
 
-        private void TryUpdateWindowsCanvas(WindowsCanvas windowsCanvas)
+        protected void Awake()
+        {
+            _canvas = GetComponent<Canvas>();
+            _myType = GetType();
+            OnAwake();
+        }
+
+        protected void OnDestroy()
+        {
+            UnsubscribeFromWindowsCanvas();
+            OnDestroed();
+        }
+
+        protected virtual void OnAwake() { }
+
+        protected virtual void OnShow() { }
+
+        protected virtual void OnHide() { }
+
+        protected virtual void OnDestroed() { }
+
+        private void UpdateWindowsCanvas(WindowsCanvas windowsCanvas)
         {
             if (UsingCanvas != windowsCanvas)
             {
@@ -101,23 +122,5 @@ namespace DanPie.Framework.WindowSystem
             }
             _canvas.sortingOrder = SortOrder;
         }
-
-        protected void Awake()
-        {
-            _canvas = GetComponent<Canvas>();
-            _myType = GetType();
-            OnAwake();
-        }
-
-        protected void OnDestroy()
-        {
-            UnsubscribeFromWindowsCanvas();
-            OnDestroed();
-        }
-
-        protected virtual void OnAwake() { }
-        protected virtual void OnShow() { }
-        protected virtual void OnHide() { }
-        protected virtual void OnDestroed() { }
     }
 }

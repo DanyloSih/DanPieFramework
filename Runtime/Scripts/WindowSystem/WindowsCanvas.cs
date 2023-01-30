@@ -27,6 +27,16 @@ namespace DanPie.Framework.WindowSystem
 
         public event Action<WindowsCanvas> SortingOrderChanged;
 
+        public List<IWindow> GetSortedVisibleWindows()
+        {
+            List<IWindow> windows = new List<IWindow>();
+            foreach (WindowData windowData in GetSortedVisibleWindowsData())
+            {
+                windows.Add(windowData.Window);
+            }
+            return windows;
+        }
+
         public IWindow GetOrCreateWindow(Type type, Func<IWindow> windowFactoryMethod)
         {
             if (!IsWindowExist(type))
@@ -81,7 +91,7 @@ namespace DanPie.Framework.WindowSystem
             WindowData windowData = GetWindowData(windowType);
             if (!windowData.Window.IsVisible)
             {
-                throw new ArgumentException("To focus window, it must be visible!");
+                throw new ArgumentException("To focus windowData, it must be visible!");
             }
             var sortedWindows = GetSortedVisibleWindowsData();
             sortedWindows.Remove(windowData);
@@ -96,7 +106,7 @@ namespace DanPie.Framework.WindowSystem
 
             if (!windowData.Window.IsVisible)
             {
-                throw new ArgumentException("To get window SortOrder, it must be visible!");
+                throw new ArgumentException("To get windowData SortOrder, it must be visible!");
             }
 
             return windowData.SortingOrder;

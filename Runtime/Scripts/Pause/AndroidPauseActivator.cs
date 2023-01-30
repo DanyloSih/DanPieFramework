@@ -1,26 +1,29 @@
-﻿using DanPie.Framework.Common;
+﻿using System.Collections.Generic;
+using System.Linq;
+using DanPie.Framework.Common;
 using DanPie.Framework.WindowSystem;
 using UnityEngine;
 
 namespace DanPie.Framework.Pause
 {
+
     public class AndroidPauseActivator : MultipleInitializableMonoBehaviour, IPauseActivator
     {
         [SerializeField] private KeyCode _backKeyCode;
 
-        private WindowsCanvas _popupCanvas;
+        private WindowsCanvas _pauseWindowCanvas;
         private IPauseWindow _pauseWindowInstance;
         private IPauseController _pauseController;
 
         public bool Enabled { get => enabled; set => enabled = value; }
 
         public void Initialize(
-            WindowsCanvas popupCanvas,
+            WindowsCanvas pauseWindowCanvas,
             IPauseWindow pauseWindowInstance,
             IPauseController pauseController)
         {
             _pauseController = pauseController;
-            _popupCanvas = popupCanvas;
+            _pauseWindowCanvas = pauseWindowCanvas;
             _pauseWindowInstance = pauseWindowInstance;
             _pauseWindowInstance.OnContinue += Resume;
             IsInitialized = true;
@@ -58,10 +61,23 @@ namespace DanPie.Framework.Pause
         private void SetPause(bool pause)
         {
             CheckIsInitialized();
+
             if (pause)
             {
-                _popupCanvas.ShowOnly(_pauseWindowInstance.GetType());
+                HideHidableWindows();
+                _pauseWindowCanvas.ShowAlso(_pauseWindowInstance.GetType());
                 _pauseController.PauseObjects();
+            }
+        }
+
+        private void HideHidableWindows()
+        {
+            IEnumerable<IWindow> windows =
+                _pauseWindowCanvas.GetSortedVisibleWindows().Where(x => !(x is IUnhideableFromPause));
+
+            foreach (IWindow window in windows)
+            {
+                window.Hide();
             }
         }
 
@@ -74,19 +90,42 @@ namespace DanPie.Framework.Pause
         private void OnBackButtonPressed()
         {
             CheckIsInitialized();
-            IWindow window = _popupCanvas.GetFocusedWindow();
-            if (window != null)
+            List<IWindow> windows = _pauseWindowCanvas.GetSortedVisibleWindows();
+
+            if (windows == null || windows.Count == 0)
             {
-                if (window.GetType() == _pauseWindowInstance.GetType())
-                {
-                    _pauseController.ResumeObjects();
-                }
-                window.Hide();
+                SetPause(true);
+                return;
             }
-            else
+
+            if (windows.Last().GetType() == _pauseWindowInstance.GetType())
             {
-                _popupCanvas.ShowOnly(_pauseWindowInstance.GetType());
-                _pauseController.PauseObjects();
+                Resume();
+                return;
+            }
+
+            for (int i = windows.Count - 1; i >= 0; i--)
+            {
+                var window = windows[i];
+
+                if (window is IUnhideableFromPause)
+                {
+                    if (!((IUnhideableFromPause)window).IsPauseWindowCanBeShown())
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    window.Hide();
+                    return;
+                }
+                
+                if (i == 0)
+                {
+                    SetPause(true);
+                    return;
+                }
             }
         }
     }
