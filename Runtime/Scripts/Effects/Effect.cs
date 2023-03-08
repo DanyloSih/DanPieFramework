@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace DanPie.Framework.Effects
 {
+
     public class Effect : PausableObject
     {
         [SerializeField] private GameObject _effectGameObject;
