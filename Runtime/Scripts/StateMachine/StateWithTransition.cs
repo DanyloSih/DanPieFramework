@@ -9,10 +9,14 @@ namespace DanPie.Framework.StateMachine
     {
         [SerializeField] private List<Transition> _transitions;
 
+        public bool IsTransited { get; private set; } = true;
+
         public event Action<IState> OnTransited;
 
         public void Enter()
         {
+            IsTransited = false;
+
             foreach (Transition transition in _transitions)
             {
                 transition.OnTransited += Exit;
@@ -21,8 +25,9 @@ namespace DanPie.Framework.StateMachine
             OnEnter();
         }
 
-        protected void Exit(IState state)
+        public void Exit(IState state)
         {
+            IsTransited = true;
             foreach (Transition transition in _transitions)
             {
                 transition.OnTransited -= Exit;

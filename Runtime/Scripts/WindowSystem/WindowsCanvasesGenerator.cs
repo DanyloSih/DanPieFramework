@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace DanPie.Framework.WindowSystem
 {
-    public class WindowsCanvasesCreator
+    public class WindowsCanvasesCreator<T>
+        where T : WindowsCanvas
     {
         private int _countOfOrdersInLayer;
 
@@ -13,9 +14,9 @@ namespace DanPie.Framework.WindowSystem
             _countOfOrdersInLayer = countOfOrdersInLayer;
         }
 
-        public List<WindowsCanvas> CreateWindowsCanvases(int windowsCanvasesCount)
+        public List<T> CreateWindowsCanvases(int windowsCanvasesCount)
         {
-            List<WindowsCanvas> windowsCanvases = new List<WindowsCanvas>();
+            List<T> windowsCanvases = new List<T>();
 
             for (int i = 0; i < windowsCanvasesCount; i++)
             {
@@ -25,9 +26,9 @@ namespace DanPie.Framework.WindowSystem
             return windowsCanvases;
         }
 
-        private WindowsCanvas CreateWindowsCanvas(int windowsCanvasId)
+        private T CreateWindowsCanvas(int windowsCanvasId)
         {
-            WindowsCanvas windowsCanvas = new GameObject().AddComponent<WindowsCanvas>();
+            T windowsCanvas = new GameObject().AddComponent<T>();
             windowsCanvas.gameObject.name = $"WindowsCanvas |{windowsCanvasId}|";
 
             windowsCanvas.SetLayerSortOrderBounds(new Vector2Int(

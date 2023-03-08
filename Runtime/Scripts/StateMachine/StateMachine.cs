@@ -7,6 +7,16 @@
 
         public T CurrentState { get => _currentState; }
 
+        public void SetState(IState state)
+        {
+            if (_currentState != null && !_currentState.IsTransited)
+            {
+                _currentState.Exit(state);
+            }
+
+            SetTState((T)state);
+        }
+
         protected void StartStateMachine(T initialState)
         {
             _currentState = initialState;
@@ -15,11 +25,6 @@
         }
 
         protected virtual void OnStateEnter(T state) { }
-
-        private void SetState(IState state)
-        {
-            SetTState((T)state);
-        }
 
         private void SetTState(T state)
         {

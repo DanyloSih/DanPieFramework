@@ -1,5 +1,7 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace DanPie.Framework.WindowSystem
 {
@@ -69,7 +71,17 @@ namespace DanPie.Framework.WindowSystem
 
         protected virtual void OnAwake() { }
 
-        protected virtual void OnShow() { }
+        protected virtual void OnShow()
+        {
+            var compoents = GetComponentsInChildren<LayoutGroup>();
+            Canvas.ForceUpdateCanvases();
+            foreach (var item in compoents)
+            {
+                item.enabled = false;
+                item.enabled = true;
+            }
+            Canvas.ForceUpdateCanvases();
+        }
 
         protected virtual void OnHide() { }
 

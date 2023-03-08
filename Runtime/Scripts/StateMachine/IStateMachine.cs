@@ -4,5 +4,7 @@
         where T : IState
     {
         public T CurrentState { get; }
+
+        public void SetState(IState state);
     }
 }

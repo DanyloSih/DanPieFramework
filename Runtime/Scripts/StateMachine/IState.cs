@@ -6,6 +6,9 @@ namespace DanPie.Framework.StateMachine
     {
         public event Action<IState> OnTransited;
 
+        public bool IsTransited { get; }
+
         public void Enter();
+        public void Exit(IState nextState);
     }
 }

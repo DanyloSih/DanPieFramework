@@ -58,6 +58,12 @@ namespace DanPie.Framework.WindowSystem
             return (T)GetWindow(typeof(T));
         }
 
+        public T InstanceOf<T>(T prefab)
+            where T : WindowObject
+        {
+            return GetOrCreateWindow(() => InstantiateWindow(prefab));
+        }
+
         public void AddUniqueWindow(IWindow window)
         {
             if (IsWindowExist(window.GetType()))
@@ -192,6 +198,12 @@ namespace DanPie.Framework.WindowSystem
         protected void Awake()
         {
             _currentSortingOrder = _layerSortOrderBounds.x;
+        }
+
+        protected virtual T InstantiateWindow<T>(T windowPrefab)
+            where T : WindowObject
+        {
+            return Instantiate(windowPrefab, transform);
         }
 
         private void ResetSortingOrders(List<WindowData> activeWindows)
