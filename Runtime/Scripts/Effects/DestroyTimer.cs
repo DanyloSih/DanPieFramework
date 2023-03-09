@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using DanPie.Framework.Pause;
 using UnityEngine;
 
@@ -8,6 +9,7 @@ namespace DanPie.Framework.Effects
     {
         [SerializeField] private float _destroyTime;
         [SerializeField] private bool _startTimerOnEnable = true;
+        [SerializeField] private List<GameObject> _destroyingGameObjects;
 
         private Coroutine _timerCoroutine;
 
@@ -21,7 +23,7 @@ namespace DanPie.Framework.Effects
 
         public void StartTimer()
         {
-            if (_timerCoroutine != null)
+            if (_timerCoroutine == null)
             {
                 _timerCoroutine = StartCoroutine(TimerProcess());
             }
@@ -30,6 +32,7 @@ namespace DanPie.Framework.Effects
         private IEnumerator TimerProcess()
         {
             yield return new PausableWaitForSeconds(_destroyTime, this);
+            _destroyingGameObjects.ForEach(x => Destroy(x));
         }
     }
 }
