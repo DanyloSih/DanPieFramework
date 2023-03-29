@@ -1,4 +1,5 @@
 ﻿using System;
+using DanPie.Framework.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -6,7 +7,7 @@ using UnityEngine.UI;
 namespace DanPie.Framework.WindowSystem
 {
     [RequireComponent(typeof(Canvas))]
-    public abstract class WindowObject : MonoBehaviour, IWindow
+    public abstract class WindowObject : LayoutsUpdater, IWindow
     {
         private Type _myType;
         private int _hidesCounter = 0;
@@ -73,14 +74,7 @@ namespace DanPie.Framework.WindowSystem
 
         protected virtual void OnShow()
         {
-            var compoents = GetComponentsInChildren<LayoutGroup>();
-            Canvas.ForceUpdateCanvases();
-            foreach (var item in compoents)
-            {
-                item.enabled = false;
-                item.enabled = true;
-            }
-            Canvas.ForceUpdateCanvases();
+            UpdateLayouts();
         }
 
         protected virtual void OnHide() { }
