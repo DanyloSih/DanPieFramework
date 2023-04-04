@@ -1,8 +1,6 @@
 ﻿using System;
 using DanPie.Framework.UI;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace DanPie.Framework.WindowSystem
 {

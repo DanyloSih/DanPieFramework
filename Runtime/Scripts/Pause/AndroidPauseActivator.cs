@@ -38,7 +38,7 @@ namespace DanPie.Framework.Pause
         {
             if (Enabled)
             {
-                SetPause(!focus);
+                SetPause(!focus, true);
             }
         }
 
@@ -58,27 +58,48 @@ namespace DanPie.Framework.Pause
             }
         }
 
-        private void SetPause(bool pause)
+        private void SetPause(bool pause, bool isFocusLost = false)
         {
             CheckIsInitialized();
 
             if (pause)
             {
-                HideHidableWindows();
-                _pauseWindowCanvas.ShowAlso(_pauseWindowInstance.GetType());
-                _pauseController.PauseObjects();
+                HideHidableWindows(isFocusLost);
+
+                if (GetUnhideableFromLoosingFocusWindows().Count() == 0)
+                {
+                    _pauseWindowCanvas.ShowAlso(_pauseWindowInstance.GetType());
+                    _pauseController.PauseObjects();
+                }
             }
         }
 
-        private void HideHidableWindows()
+        private void HideHidableWindows(bool isFocusLost = false)
         {
-            IEnumerable<IWindow> windows =
-                _pauseWindowCanvas.GetSortedVisibleWindows().Where(x => !(x is IUnhideableFromPause));
+            IEnumerable<IWindow> windows = _pauseWindowCanvas.GetSortedVisibleWindows()
+                .Where(x => !(x is IUnhideableFromPause) && !(x is IUnhideableFromLoosingFocus));
+
+            if (isFocusLost)
+            {
+                IEnumerable<IUnhideableFromLoosingFocus> unhideableFromLoosingFocus 
+                    = GetUnhideableFromLoosingFocusWindows();
+
+                foreach (var window in unhideableFromLoosingFocus)
+                {
+                    window.OnFocusLoosing();
+                }
+            }
 
             foreach (IWindow window in windows)
             {
                 window.Hide();
             }
+        }
+
+        private IEnumerable<IUnhideableFromLoosingFocus> GetUnhideableFromLoosingFocusWindows()
+        {
+            return _pauseWindowCanvas.GetSortedVisibleWindows()
+                .Where(x => x is IUnhideableFromLoosingFocus).Select(x => (IUnhideableFromLoosingFocus)x);
         }
 
         private void Resume()
