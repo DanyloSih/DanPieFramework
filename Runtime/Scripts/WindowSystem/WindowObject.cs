@@ -30,6 +30,7 @@ namespace DanPie.Framework.WindowSystem
 
             _isHiding = true;
             _canvas.enabled = false;
+            _canvas.gameObject.SetActive(false);
             IsVisible = false;
             OnHide();
             _isHiding = false;
@@ -50,6 +51,7 @@ namespace DanPie.Framework.WindowSystem
             _isShowing = true;
             IsVisible = true;
             _canvas.enabled = true;
+            _canvas.gameObject.SetActive(true);
             UpdateWindowsCanvas(windowsCanvas);
             OnShow();
             _isShowing = false;

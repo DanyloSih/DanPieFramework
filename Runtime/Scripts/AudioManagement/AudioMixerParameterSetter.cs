@@ -7,7 +7,7 @@ public class AudioMixerParameterSetter : MonoBehaviour
     [SerializeField] private string _parameterName;
     [SerializeField] private float _volume;
 
-    [ContextMenu("Set")]
+    [ContextMenu("SetData")]
     public void Set()
     {
         _audioMixer.SetFloat(_parameterName, _volume);

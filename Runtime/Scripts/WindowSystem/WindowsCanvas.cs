@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using UnityEngine;
 
 namespace DanPie.Framework.WindowSystem
 {
-
     public class WindowsCanvas : MonoBehaviour
 	{
         private class WindowData
@@ -26,6 +26,21 @@ namespace DanPie.Framework.WindowSystem
         private List<WindowData> _windowsData = new List<WindowData>();
 
         public event Action<WindowsCanvas> SortingOrderChanged;
+
+        public void RemoveAllWindows()
+        {
+            foreach (var winData in _windowsData)
+            {
+                winData.Window.Hide();
+
+                if (winData.Window is WindowObject)
+                {
+                    Destroy(((WindowObject)winData.Window).gameObject);
+                }
+            }
+
+            _windowsData.Clear();
+        }
 
         public List<IWindow> GetSortedVisibleWindows()
         {

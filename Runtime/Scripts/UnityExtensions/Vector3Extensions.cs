@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DanPie.Framework.UnityExtensions
 {
-    public static class Vector3Extension
+    public static class Vector3Extensions
     {
         public static Vector3 Merge(this Vector3 a, Vector3 b, Func<float, float, float> mergeFunc)
         {

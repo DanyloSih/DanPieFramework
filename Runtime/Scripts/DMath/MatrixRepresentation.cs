@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DanPie.Framework.DMath
 {
     [Serializable]
-    public class MatrixRepresentation<T>
+    public class MatrixRepresentation<T> : IReadonlyMatrixRepresentation<T>
     {
         [HideInInspector]
         [SerializeField] private T[] _data;
@@ -77,15 +77,59 @@ namespace DanPie.Framework.DMath
 
         }
 
-        public Vector2Int FormIDToVector(int dataID)
+        public int VectorToID(Vector2Int vector)
+        {
+            return vector.y * _columns + vector.x;
+        }
+
+        public Vector2Int FromIDToVector(int dataID)
             => new Vector2Int(dataID % _columns, dataID / _columns);
 
-        public IEnumerable GetEnumerable() => _data;
+        public IEnumerable<T> GetEnumerable() => _data;
 
-        public T Get(Vector2Int columnRowVector)
+        public bool IsPointInside(Vector2Int point)
+        {
+            return point.x >= 0 && point.x < Columns
+                && point.y >= 0 && point.y < Rows;
+        }
+
+        public void SetMatrixMember(MatrixMember<T> matrixMember)
+        {
+            _data[matrixMember.ID] = matrixMember.Data;
+        }
+
+        public MatrixMember<T> GetMatrixMember(Vector2Int columnRowVector)
+        {
+            return new MatrixMember<T>(GetData(columnRowVector), VectorToID(columnRowVector));
+        }
+
+        public T GetData(Vector2Int columnRowVector)
             => this[columnRowVector.x, columnRowVector.y];
 
-        public void Set(Vector2Int columnRowVector, T value)
+        public void SetData(Vector2Int columnRowVector, T value)
             => this[columnRowVector.x, columnRowVector.y] = value;
+
+        public Neighbours2D<T> GetNeighboursOfMatrixMember(Vector2Int matrixMemberPosition)
+        {
+            MatrixMember<T>?[] neighbours = new MatrixMember<T>?[9];
+            int id = 0;
+            for (int y = -1; y < 2; y++)
+            {
+                for (int x = -1; x < 2; x++)
+                {
+                    var neighborPosition = matrixMemberPosition + new Vector2Int(x, -y);
+                    try
+                    {
+                        neighbours[id] = GetMatrixMember(neighborPosition);
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        continue;
+                    }
+                    id++;
+                }
+            }
+            return new Neighbours2D<T>(neighbours);
+        }
     }
 }

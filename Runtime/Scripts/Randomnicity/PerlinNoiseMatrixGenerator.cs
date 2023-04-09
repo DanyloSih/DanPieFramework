@@ -19,7 +19,7 @@ namespace DanPie.Framework.Randomnicity
 
             if(seed != null)
             {
-                UpdateSeed((int)seed);
+                Seed = (int)seed;
             }
         }
 

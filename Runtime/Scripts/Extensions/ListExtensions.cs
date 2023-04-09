@@ -2,7 +2,7 @@
 
 namespace DanPie.Framework.Extensions
 {
-    public static class ListExtension
+    public static class ListExtensions
     {
         public static T PopAt<T>(this List<T> list, int index)
         {

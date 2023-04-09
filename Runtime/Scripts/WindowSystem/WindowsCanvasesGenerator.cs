@@ -26,10 +26,16 @@ namespace DanPie.Framework.WindowSystem
             return windowsCanvases;
         }
 
+        protected virtual T CreateWindowsCanvasObject(int windowsCanvasId)
+        {
+            var obj = new GameObject().AddComponent<T>();
+            obj.gameObject.name = $"WindowsCanvas |{windowsCanvasId}|";
+            return obj;
+        }
+
         private T CreateWindowsCanvas(int windowsCanvasId)
         {
-            T windowsCanvas = new GameObject().AddComponent<T>();
-            windowsCanvas.gameObject.name = $"WindowsCanvas |{windowsCanvasId}|";
+            T windowsCanvas = CreateWindowsCanvasObject(windowsCanvasId);
 
             windowsCanvas.SetLayerSortOrderBounds(new Vector2Int(
                 _countOfOrdersInLayer * windowsCanvasId + 1, 

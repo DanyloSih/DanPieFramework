@@ -2,6 +2,7 @@
 
 namespace DanPie.Framework.Common
 {
+
     public class NonInitializedException : Exception
     {
         public NonInitializedException() 

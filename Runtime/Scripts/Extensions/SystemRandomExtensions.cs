@@ -2,8 +2,16 @@
 
 namespace DanPie.Framework.Extensions
 {
-    public static class SystemRandomExtension
+    public static class SystemRandomExtensions
     {
+        /// <summary>
+        /// Generates a random sign. Specifically, either the number -1 or +1.
+        /// </summary>
+        public static int NextSign(this System.Random rand)
+        {
+            return rand.Next(0, 2) * 2 - 1;
+        }
+
         /// <summary>
         /// Min value - inclusive, Max value - inclusive
         /// </summary>
